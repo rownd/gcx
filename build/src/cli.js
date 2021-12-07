@@ -1,18 +1,17 @@
 #!/usr/bin/env node
-import * as meow from 'meow';
-import {Deployer, DeployerOptions, ProgressEvent} from './';
-import * as updateNotifier from 'update-notifier';
-import ora = require('ora');
-import * as util from 'util';
-import * as fs from 'fs';
-import * as path from 'path';
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const meow = require("meow");
+const _1 = require("./");
+const updateNotifier = require("update-notifier");
+const ora = require("ora");
+const util = require("util");
+const fs = require("fs");
+const path = require("path");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require('../../package.json');
-updateNotifier({pkg}).notify();
-
-const cli = meow(
-  `
+updateNotifier({ pkg }).notify();
+const cli = meow(`
     Usage
       $ gcx deploy FUNCTION_NAME
 
@@ -131,136 +130,131 @@ const cli = meow(
 
     Examples
       $ gcx deploy some-cloud-function
-`,
-  {
+`, {
     flags: {
-      description: {type: 'string'},
-      entryPoint: {type: 'string'},
-      runtime: {type: 'string'},
-      timeout: {type: 'string'},
-      network: {type: 'string'},
-      retry: {type: 'boolean'},
-      memory: {type: 'string'},
-      project: {type: 'string'},
-      projectId: {type: 'string'},
-      triggerBucket: {type: 'string'},
-      triggerHttp: {type: 'boolean'},
-      triggerTopic: {type: 'string'},
-      triggerResource: {type: 'string'},
-      triggerEvent: {type: 'string'},
-      targetDir: {type: 'string'},
-      region: {type: 'string'},
-      maxInstances: {type: 'string'},
-      vpcConnector: {type: 'string'},
-      environmentVariables: {type: 'string'},
+        description: { type: 'string' },
+        entryPoint: { type: 'string' },
+        runtime: { type: 'string' },
+        timeout: { type: 'string' },
+        network: { type: 'string' },
+        retry: { type: 'boolean' },
+        memory: { type: 'string' },
+        project: { type: 'string' },
+        projectId: { type: 'string' },
+        triggerBucket: { type: 'string' },
+        triggerHttp: { type: 'boolean' },
+        triggerTopic: { type: 'string' },
+        triggerResource: { type: 'string' },
+        triggerEvent: { type: 'string' },
+        targetDir: { type: 'string' },
+        region: { type: 'string' },
+        maxInstances: { type: 'string' },
+        vpcConnector: { type: 'string' },
+        environmentVariables: { type: 'string' },
     },
-  }
-);
-
+});
 async function main() {
-  if (cli.input.length !== 2) {
-    cli.showHelp();
-    return;
-  }
-  switch (cli.input[0]) {
-    case 'deploy': {
-      const start = Date.now();
-      const opts = cli.flags as {} as DeployerOptions;
-      opts.name = cli.input[1];
-      const targetDir = opts.targetDir || process.cwd();
-      const hasIgnore = await hasIgnoreFile(targetDir);
-      if (!hasIgnore) {
-        await generateIgnoreFile(targetDir);
-      }
-      const spinny = ora('Initializing deployment...').start();
-      const deployinator = new Deployer(opts);
-      deployinator
-        .on(ProgressEvent.PACKAGING, () => {
-          spinny.stopAndPersist({
-            symbol: '🤖',
-            text: 'Deployment initialized.',
-          });
-          spinny.start('Packaging sources...');
-        })
-        .on(ProgressEvent.UPLOADING, () => {
-          spinny.stopAndPersist({
-            symbol: '📦',
-            text: 'Source code packaged.',
-          });
-          spinny.start('Uploading source...');
-        })
-        .on(ProgressEvent.DEPLOYING, () => {
-          spinny.stopAndPersist({
-            symbol: '🛸',
-            text: 'Source uploaded to cloud.',
-          });
-          spinny.start('Deploying function...');
-        })
-        .on(ProgressEvent.COMPLETE, () => {
-          const seconds = (Date.now() - start) / 1000;
-          spinny.stopAndPersist({
-            symbol: '🚀',
-            text: `Function deployed in ${seconds} seconds.`,
-          });
-        });
-      await deployinator.deploy();
-      break;
+    if (cli.input.length !== 2) {
+        cli.showHelp();
+        return;
     }
-    default:
-      cli.showHelp();
-  }
+    switch (cli.input[0]) {
+        case 'deploy': {
+            const start = Date.now();
+            const opts = cli.flags;
+            opts.name = cli.input[1];
+            const targetDir = opts.targetDir || process.cwd();
+            const hasIgnore = await hasIgnoreFile(targetDir);
+            if (!hasIgnore) {
+                await generateIgnoreFile(targetDir);
+            }
+            const spinny = ora('Initializing deployment...').start();
+            const deployinator = new _1.Deployer(opts);
+            deployinator
+                .on(_1.ProgressEvent.PACKAGING, () => {
+                spinny.stopAndPersist({
+                    symbol: '🤖',
+                    text: 'Deployment initialized.',
+                });
+                spinny.start('Packaging sources...');
+            })
+                .on(_1.ProgressEvent.UPLOADING, () => {
+                spinny.stopAndPersist({
+                    symbol: '📦',
+                    text: 'Source code packaged.',
+                });
+                spinny.start('Uploading source...');
+            })
+                .on(_1.ProgressEvent.DEPLOYING, () => {
+                spinny.stopAndPersist({
+                    symbol: '🛸',
+                    text: 'Source uploaded to cloud.',
+                });
+                spinny.start('Deploying function...');
+            })
+                .on(_1.ProgressEvent.COMPLETE, () => {
+                const seconds = (Date.now() - start) / 1000;
+                spinny.stopAndPersist({
+                    symbol: '🚀',
+                    text: `Function deployed in ${seconds} seconds.`,
+                });
+            });
+            await deployinator.deploy();
+            break;
+        }
+        default:
+            cli.showHelp();
+    }
 }
-
 /**
  * Parses a comma-separated list of environment variables into an object. The keys of
  * this object are the environment variable names, with the values being their respective
  * values.
- * 
+ *
  * e.g. KEY1=value1, KEY2=value2 -> { KEY1: 'value1', KEY2: 'value2' }
  * @param environmentVariables String of comma-separated list of environment variables
  * @returns An object with the environment variables as keys
  */
-function parseEnvironmentVariables(environmentVariables: string) {
-  if (!environmentVariables) {
-    return {};
-  }
-  return environmentVariables.split(',')
-    .map((seg: string) => seg.trim())
-    .reduce((acc: object, seg: string) => {
-      let splitSeg = seg.split('=');
-      return {
-        ...acc,
-        [splitSeg[0].trim()]: splitSeg[1].trim(),
-      }
+function parseEnvironmentVariables(environmentVariables) {
+    if (!environmentVariables) {
+        return {};
+    }
+    return environmentVariables.split(',')
+        .map((seg) => seg.trim())
+        .reduce((acc, seg) => {
+        let splitSeg = seg.split('=');
+        return {
+            ...acc,
+            [splitSeg[0].trim()]: splitSeg[1].trim(),
+        };
     }, {});
 }
-
-async function generateIgnoreFile(targetDir: string) {
-  console.log(`
+async function generateIgnoreFile(targetDir) {
+    console.log(`
     🤖 I generated a '.gcloudignore' file in the target directory.
        This file contains a list of glob patterns that should be ingored
        in your deployment. It works just like a .gitignore file 💜
   `);
-  await new Promise((resolve, reject) => {
-    fs.createReadStream(path.join(__dirname, '../../src/.gcloudignore'))
-      .pipe(fs.createWriteStream(path.join(targetDir, '.gcloudignore')))
-      .on('error', reject)
-      .on('close', resolve);
-  });
+    await new Promise((resolve, reject) => {
+        fs.createReadStream(path.join(__dirname, '../../src/.gcloudignore'))
+            .pipe(fs.createWriteStream(path.join(targetDir, '.gcloudignore')))
+            .on('error', reject)
+            .on('close', resolve);
+    });
 }
-
 /**
  * Checks to see if a given directory has a `.gcloudignore` file.
  * @param targetDir The directory with the sources to deploy.
  */
-async function hasIgnoreFile(targetDir: string) {
-  const ignoreFile = path.join(targetDir, '.gcloudignore');
-  try {
-    await util.promisify(fs.stat)(ignoreFile);
-    return true;
-  } catch (e) {
-    return false;
-  }
+async function hasIgnoreFile(targetDir) {
+    const ignoreFile = path.join(targetDir, '.gcloudignore');
+    try {
+        await util.promisify(fs.stat)(ignoreFile);
+        return true;
+    }
+    catch (e) {
+        return false;
+    }
 }
-
 main().catch(console.error);
+//# sourceMappingURL=cli.js.map

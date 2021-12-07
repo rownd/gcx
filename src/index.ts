@@ -53,6 +53,9 @@ export interface DeployerOptions extends GoogleAuthOptions {
   entryPoint?: string;
   project?: string;
   targetDir?: string;
+  environmentVariables?: {
+    [key: string]: string;
+  };
 }
 
 /**
@@ -212,6 +215,7 @@ export class Deployer extends GCXClient {
       availableMemoryMb: this._options.memory,
       maxInstances: this._options.maxInstances,
       vpcConnector: this._options.vpcConnector,
+      environmentVariables: this._options.environmentVariables,
     };
     if (this._options.triggerTopic) {
       requestBody.eventTrigger = {
