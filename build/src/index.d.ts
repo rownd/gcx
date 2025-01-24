@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { EventEmitter } from 'events';
 import { GaxiosResponse } from 'gaxios';
 import { GoogleAuth, GoogleAuthOptions } from 'google-auth-library';

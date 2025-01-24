@@ -3,14 +3,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const meow = require("meow");
 const _1 = require("./");
-const updateNotifier = require("update-notifier");
+const update_notifier_1 = require("update-notifier");
 const ora = require("ora");
 const util = require("util");
 const fs = require("fs");
 const path = require("path");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require('../../package.json');
-updateNotifier({ pkg }).notify();
+(0, update_notifier_1.default)({ pkg }).notify();
 const cli = meow(`
     Usage
       $ gcx deploy FUNCTION_NAME

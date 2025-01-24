@@ -62,7 +62,7 @@ describe('ignore rules', () => {
       'node_modules',
       'test/',
     ];
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       fs.createReadStream(gcloudignore)
         .pipe(fs.createWriteStream('.gcloudignore'))
         .on('close', resolve)

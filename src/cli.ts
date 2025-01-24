@@ -241,7 +241,7 @@ async function generateIgnoreFile(targetDir: string) {
        This file contains a list of glob patterns that should be ingored
        in your deployment. It works just like a .gitignore file 💜
   `);
-  await new Promise((resolve, reject) => {
+  await new Promise<void>((resolve, reject) => {
     fs.createReadStream(path.join(__dirname, '../../src/.gcloudignore'))
       .pipe(fs.createWriteStream(path.join(targetDir, '.gcloudignore')))
       .on('error', reject)

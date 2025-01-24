@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.call = exports.deploy = exports.Caller = exports.Deployer = exports.GCXClient = exports.ProgressEvent = void 0;
+exports.Caller = exports.Deployer = exports.GCXClient = exports.ProgressEvent = void 0;
+exports.deploy = deploy;
+exports.call = call;
 const archiver = require("archiver");
 const events_1 = require("events");
 const fs = require("fs");
@@ -22,7 +24,7 @@ var ProgressEvent;
     ProgressEvent["DEPLOYING"] = "DEPLOYING";
     ProgressEvent["CALLING"] = "CALLING";
     ProgressEvent["COMPLETE"] = "COMPLETE";
-})(ProgressEvent = exports.ProgressEvent || (exports.ProgressEvent = {}));
+})(ProgressEvent || (exports.ProgressEvent = ProgressEvent = {}));
 /**
  * A generic client for GCX.
  */
@@ -309,10 +311,8 @@ async function deploy(options) {
     const deployer = new Deployer(options);
     return deployer.deploy();
 }
-exports.deploy = deploy;
 async function call(options) {
     const caller = new Caller(options);
     return caller.call(options);
 }
-exports.call = call;
 //# sourceMappingURL=index.js.map
